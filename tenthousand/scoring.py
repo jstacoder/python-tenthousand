@@ -1,26 +1,28 @@
+import os
 from functools import partial
+DEBUG = os.environ.get('DEBUG',False)
 
 def score_n_of_a_kind(n,nums,num):
-	base_table = {x : 100 if x != 1 else 1000 for x in range(1,7) }
-	base = base_table[num]
-	score = get_score(n,num*base)
-	check_func = check_n_funcs[str(n)]
-	return score if check_func(nums,num) else 0
-	
+    base_table = {x : 100 if x != 1 else 1000 for x in range(1,7) }
+    base = base_table[num]
+    score = get_score(n,num*base)
+    check_func = check_n_funcs[str(n)]
+    return score if check_func(nums,num) else 0
+
 def _get_n_of_a_kind_scores(nums):
-	results = { str(n) : 0 for n in range(1,7) }
-	for k in results.keys():
-		for check in range(3,7):
-			_k = int(k)
-			if not results[k]:
-				results[k] = score_n_of_a_kind(check,nums,_k)
-	return results
+    results = { str(n) : 0 for n in range(1,7) }
+    for k in results.keys():
+        for check in range(3,7):
+            _k = int(k)
+            if not results[k]:
+                results[k] = score_n_of_a_kind(check,nums,_k)
+    return results
 
 def get_score(num,base):
-	n = num - 3
-	for x in range(n):
-		base += base
-	return base
+    n = num - 3
+    for x in range(n):
+        base += base
+    return base
 
 
 def score_roll(roll):
@@ -48,11 +50,17 @@ def choose_dice(roll):
         rtn = []
         three_or_mores = get_3_or_more_from_roll(roll)
         if three_or_mores:
-            print three_or_mores
+            print three_or_mores if DEBUG else ''
             for result in three_or_mores:
-                print result
-                print rtn
+                if DEBUG:
+                    print 'before extending: '
+                    print 'result:',result
+                    print 'rtn: ',rtn
                 rtn.extend(result)
+                if DEBUG:
+                    print 'after extending: '
+                    print 'result:',result
+                    print 'rtn: ',rtn
         counts = {
             '1' : check_ones(roll),
             '5' : check_fives(roll)
@@ -61,7 +69,7 @@ def choose_dice(roll):
             for x in range(counts[n]):
                 rtn.append(int(n))
         return rtn
-		
+
 get_3_or_more_from_roll = lambda roll: filter(None, map(lambda x: check_3_or_more(roll,x),range(1,7)))
 
 single_bases = {1:100,5:50}
